@@ -16,6 +16,11 @@ INTRODUCTION					*ddc-ui-inline-introduction*
 
 This UI displayes items inline.
 
+Use virtual text by |nvim_buf_set_extmark()| in neovim or use |popup_create()|
+in Vim.
+
+Note: It does not work in command line mode.
+
 
 ==============================================================================
 INSTALL						*ddc-ui-inline-install*
