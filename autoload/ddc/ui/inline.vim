@@ -28,12 +28,12 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
 
     if exists('*nvim_buf_set_extmark')
       let col = col('.') - 1
-      let options = {
-            \ 'virt_text': [[word, a:highlight]],
-            \ 'virt_text_pos': 'overlay',
-            \ 'hl_mode': 'combine',
-            \ 'priority': 0,
-            \ 'right_gravity': v:false,
+      let options = #{
+            \   virt_text: [[word, a:highlight]],
+            \   virt_text_pos: 'overlay',
+            \   hl_mode: 'combine',
+            \   priority: 0,
+            \   right_gravity: v:false,
             \ }
     else
       let col = col('.')
@@ -41,10 +41,10 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   else
     if exists('*nvim_buf_set_extmark')
       let col = 0
-      let options = {
-          \ 'virt_text': [[word, a:highlight]],
-          \ 'hl_mode': 'combine',
-          \ 'priority': 0,
+      let options = #{
+          \   virt_text: [[word, a:highlight]],
+          \   hl_mode: 'combine',
+          \   priority: 0,
           \ }
     else
       let col = col('$') + 1
@@ -57,11 +57,11 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
           \ 0, s:ddc_namespace, line('.') - 1, col, options)
     let s:inline_popup_id = 1
   else
-    let winopts = {
-          \ 'pos': 'topleft',
-          \ 'line': line('.'),
-          \ 'col': col,
-          \ 'highlight': a:highlight,
+    let winopts = #{
+          \   pos: 'topleft',
+          \   line: line('.'),
+          \   col: col,
+          \   highlight: a:highlight,
           \ }
 
     " Use popup instead
