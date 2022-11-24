@@ -7,7 +7,7 @@ export type Params = {
 };
 
 export class Ui extends BaseUi<Params> {
-  async show(args: {
+  override async show(args: {
     denops: Denops;
     context: Context;
     completePos: number;
@@ -22,13 +22,13 @@ export class Ui extends BaseUi<Params> {
     );
   }
 
-  async hide(args: {
+  override async hide(args: {
     denops: Denops;
   }): Promise<void> {
     await args.denops.call("ddc#ui#inline#_hide");
   }
 
-  params(): Params {
+  override params(): Params {
     return {
       highlight: "Comment",
     };
