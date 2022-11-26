@@ -36,6 +36,7 @@ EXAMPLES					*ddc-ui-inline-examples*
 >
 >
 	call ddc#custom#patch_global('ui', 'inline')
+	inoremap <expr><C-t>       ddc#map#insert_item(0, "\<C-e>")
 <
 
 ==============================================================================
