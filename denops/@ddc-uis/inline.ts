@@ -1,6 +1,6 @@
 import { Context, DdcItem } from "https://deno.land/x/ddc_vim@v3.2.0/types.ts";
 import { BaseUi } from "https://deno.land/x/ddc_vim@v3.2.0/base/ui.ts";
-import { Denops } from "https://deno.land/x/ddc_vim@v3.2.0/deps.ts";
+import { Denops, fn } from "https://deno.land/x/ddc_vim@v3.2.0/deps.ts";
 
 export type Params = {
   highlight: string;
@@ -20,6 +20,16 @@ export class Ui extends BaseUi<Params> {
       args.items,
       args.uiParams.highlight,
     );
+  }
+
+  override async skipCompletion(args: {
+    denops: Denops;
+  }): Promise<boolean> {
+    // Skip for other popup
+    const checkNative = await fn.pumvisible(args.denops) as boolean;
+    const checkPum = await fn.exists(args.denops, "pum#visible") &&
+      await args.denops.call("pum#visible") as boolean;
+    return checkNative || checkPum;
   }
 
   override async hide(args: {

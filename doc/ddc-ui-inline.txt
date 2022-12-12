@@ -21,6 +21,7 @@ in Vim.
 
 Note: It does not work in command line mode.
 
+Note: It does not work if completion menu is displayed.
 
 ==============================================================================
 INSTALL						*ddc-ui-inline-install*
