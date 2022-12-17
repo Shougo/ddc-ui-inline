@@ -17,4 +17,7 @@ https://github.com/Shougo/ddc.vim
 ```vim
 call ddc#custom#patch_global('ui', 'inline')
 inoremap <expr><C-t>       ddc#map#insert_item(0, "\<C-e>")
+
+" Cancel
+inoremap <C-e>   <Cmd>call ddc#hide('Manual')<CR>
 ```
