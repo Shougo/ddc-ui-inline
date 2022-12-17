@@ -17,41 +17,37 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
 
   let complete_str = ddc#util#get_input('')[a:pos :]
   let word = a:items[0].word
+  let remaining = word[len(complete_str):]
 
-  if stridx(word, complete_str) == 0
+  if remaining ==# ''
+    return
+  endif
 
-    let remaining = word[len(complete_str):]
-    if remaining ==# ''
-      return
-    endif
-
-    if col('.') == col('$')
-      " Head matched: Follow cursor text
-      let word = remaining
-      if exists('*nvim_buf_set_extmark')
-        let col = col('.') - 1
-        let options = #{
-              \   virt_text: [[word, a:highlight]],
-              \   virt_text_pos: 'overlay',
-              \   hl_mode: 'combine',
-              \   priority: 0,
-              \   right_gravity: v:false,
-              \ }
-      else
-        let col = col('.')
-      endif
+  if stridx(word, complete_str) == 0 && col('.') == col('$')
+    " Head matched: Follow cursor text
+    let word = remaining
+    if exists('*nvim_buf_set_extmark')
+      let col = col('.') - 1
+      let options = #{
+            \   virt_text: [[word, a:highlight]],
+            \   virt_text_pos: 'overlay',
+            \   hl_mode: 'combine',
+            \   priority: 0,
+            \   right_gravity: v:false,
+            \ }
     else
-
-      if exists('*nvim_buf_set_extmark')
-        let col = 0
-        let options = #{
-              \   virt_text: [[word, a:highlight]],
-              \   hl_mode: 'combine',
-              \   priority: 0,
-              \ }
-      else
-        let col = col('$') + 1
-      endif
+      let col = col('.')
+    endif
+  else
+    if exists('*nvim_buf_set_extmark')
+      let col = 0
+      let options = #{
+            \   virt_text: [[word, a:highlight]],
+            \   hl_mode: 'combine',
+            \   priority: 0,
+            \ }
+    else
+      let col = col('$') + 1
     endif
   endif
 
