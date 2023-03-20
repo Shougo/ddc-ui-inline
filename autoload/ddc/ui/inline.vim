@@ -15,9 +15,9 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     return
   endif
 
-  let complete_str = ddc#util#get_input('')[a:pos :]
+  const complete_str = ddc#util#get_input('')[a:pos :]
   let word = a:items[0].word
-  let remaining = word[complete_str->len():]
+  const remaining = word[complete_str->len():]
 
   if remaining ==# ''
     return
@@ -27,8 +27,8 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     " Head matched: Follow cursor text
     let word = remaining
     if exists('*nvim_buf_set_extmark')
-      let col = '.'->col() - 1
-      let options = #{
+      const col = '.'->col() - 1
+      const options = #{
             \   virt_text: [[word, a:highlight]],
             \   virt_text_pos: 'overlay',
             \   hl_mode: 'combine',
@@ -36,18 +36,18 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
             \   right_gravity: v:false,
             \ }
     else
-      let col = '.'->col()
+      const col = '.'->col()
     endif
   else
     if '*nvim_buf_set_extmark'->exists()
-      let col = 0
-      let options = #{
+      const col = 0
+      const options = #{
             \   virt_text: [[word, a:highlight]],
             \   hl_mode: 'combine',
             \   priority: 0,
             \ }
     else
-      let col = '$'->col() + 1
+      const col = '$'->col() + 1
     endif
   endif
 
@@ -57,7 +57,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
           \ 0, s:ddc_namespace, '.'->line() - 1, col, options)
     let s:inline_popup_id = 1
   else
-    let winopts = #{
+    const winopts = #{
           \   pos: 'topleft',
           \   line: '.'->line(),
           \   col: col,
