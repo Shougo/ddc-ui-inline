@@ -31,7 +31,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       const options = #{
             \   virt_text: [[word, a:highlight]],
             \   virt_text_pos: 'overlay',
-            \   hl_mode: 'combine',
+            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
             \   priority: 0,
             \   right_gravity: v:false,
             \ }
@@ -43,7 +43,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       const col = 0
       const options = #{
             \   virt_text: [[word, a:highlight]],
-            \   hl_mode: 'combine',
+            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
             \   priority: 0,
             \ }
     else
