@@ -3,7 +3,7 @@ function! ddc#ui#inline#visible() abort
 endfunction
 
 function! ddc#ui#inline#_show(pos, items, highlight) abort
-  if '*nvim_buf_set_extmark'->exists()
+  if has('nvim')
     if 's:ddc_namespace'->exists()
       call nvim_buf_clear_namespace(0, s:ddc_namespace, 0, -1)
     else
@@ -16,47 +16,41 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   endif
 
   const complete_str = ddc#util#get_input('')[a:pos :]
-  let word = a:items[0].word
-  const remaining = word[complete_str->len():]
+  const remaining = a:items[0].word[complete_str->len():]
 
   if remaining ==# ''
     return
   endif
 
-  if word->stridx(complete_str) == 0 && '.'->col() == '$'->col()
-    " Head matched: Follow cursor text
-    let word = remaining
-    if exists('*nvim_buf_set_extmark')
-      const col = '.'->col() - 1
-      const options = #{
-            \   virt_text: [[word, a:highlight]],
-            \   virt_text_pos: 'overlay',
-            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
-            \   priority: 0,
-            \   right_gravity: v:false,
-            \ }
-    else
-      const col = '.'->col()
-    endif
-  else
-    if '*nvim_buf_set_extmark'->exists()
-      const col = 0
-      const options = #{
-            \   virt_text: [[word, a:highlight]],
-            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
-            \   priority: 0,
-            \ }
-    else
-      const col = '$'->col() + 1
-    endif
-  endif
+  " Head matched: Follow cursor text
+  const head_matched = a:items[0].word->stridx(complete_str) == 0
+        \ && '.'->col() == '$'->col()
 
-  if '*nvim_buf_set_extmark'->exists()
-    " Others: After cursor text
+  const has_inline = has('nvim-0.10')
+  const word = head_matched || has_inline ? remaining : a:items[0].word
+
+  if has('nvim')
+    const col = head_matched || has_inline ? '.'->col() - 1 : 0
+    const virt_text_pos =
+          \ head_matched ? 'overlay' : has_inline ? 'inline' : 'eol'
+    const options = #{
+          \   virt_text: [[word, a:highlight]],
+          \   virt_text_pos: virt_text_pos,
+          \   hl_mode: 'combine',
+          \   priority: 0,
+          \   right_gravity: !head_matched,
+          \ }
     call nvim_buf_set_extmark(
           \ 0, s:ddc_namespace, '.'->line() - 1, col, options)
+
+    if !head_matched && has_inline
+      " It needs update
+      autocmd InsertCharPre * ++once call ddc#ui#inline#_hide()
+    endif
+
     let s:inline_popup_id = 1
   else
+    const col = head_matched ? '.'->col() : '$'->col() + 1
     const winopts = #{
           \   pos: 'topleft',
           \   line: '.'->line(),
