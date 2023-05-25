@@ -23,32 +23,20 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     return
   endif
 
-  if word->stridx(complete_str) == 0 && '.'->col() == '$'->col()
-    " Head matched: Follow cursor text
-    let word = remaining
-    if exists('*nvim_buf_set_extmark')
-      const col = '.'->col() - 1
-      const options = #{
-            \   virt_text: [[word, a:highlight]],
-            \   virt_text_pos: 'overlay',
-            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
-            \   priority: 0,
-            \   right_gravity: v:false,
-            \ }
-    else
-      const col = '.'->col()
-    endif
+  let head_matched = word->stridx(complete_str) == 0 && '.'->col() == '$'->col()
+  let word = has('nvim-0.10') ? remaining : word
+
+  if exists('*nvim_buf_set_extmark')
+    const col = head_matched || has('nvim-0.10') ? '.'->col() - 1 : 0
+    const options = #{
+          \   virt_text: [[word, a:highlight]],
+          \   virt_text_pos: !head_matched && has('nvim-0.10') ? 'inline' : 'overlay',
+          \   hl_mode: 'combine',
+          \   priority: 0,
+          \   right_gravity: !head_matched,
+          \ }
   else
-    if '*nvim_buf_set_extmark'->exists()
-      const col = 0
-      const options = #{
-            \   virt_text: [[word, a:highlight]],
-            \   hl_mode: has('nvim-0.10') ? 'inline' : 'combine',
-            \   priority: 0,
-            \ }
-    else
-      const col = '$'->col() + 1
-    endif
+    const col = head_matched ? '.'->col() : '$'->col() + 1
   endif
 
   if '*nvim_buf_set_extmark'->exists()
