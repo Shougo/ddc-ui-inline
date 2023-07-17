@@ -117,6 +117,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   endif
 
   if is_cmdline
+    " NOTE: ddc#hide() does not work.  I don't know why.
     autocmd ddc CmdlineLeave <buffer> ++once call ddc#ui#inline#_hide()
   endif
 

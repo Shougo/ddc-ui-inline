@@ -26,7 +26,7 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
   }): Promise<boolean> {
     // Skip for other popup
-    const checkNative = await fn.pumvisible(args.denops) as boolean;
+    const checkNative = await fn.pumvisible(args.denops) !== 0;
     const checkPum = await fn.exists(args.denops, "pum#visible") &&
       await args.denops.call("pum#visible") as boolean;
     return checkNative || checkPum;
