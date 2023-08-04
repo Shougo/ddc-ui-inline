@@ -15,11 +15,11 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
 
   " Head matched: Follow cursor text
   const head_matched = a:items[0].word->stridx(complete_str) == 0
-        \ && (is_cmdline ? getcmdpos() == getcmdline()->len() + 1 :
-        \                  '.'->col() == '$'->col())
-
+        \ && (!is_cmdline || getcmdpos() == getcmdline()->len() + 1)
+  const at_eol = '.'->col() == '$'->col()
   const has_inline = has('nvim-0.10')
-  const word = head_matched || has_inline ? remaining : a:items[0].word
+  const word = head_matched && (has_inline || at_eol)
+        \ ? remaining : a:items[0].word
   const cmdline_pos = &lines - [1, &cmdheight]->max()
 
   if has('nvim')
@@ -75,20 +75,22 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       endif
 
       " Use virtual text
-      const col = head_matched || has_inline ? '.'->col() - 1 : 0
-      const virt_text_pos =
-            \ head_matched ? 'overlay' : has_inline ? 'inline' : 'eol'
+      const col = '.'->col() - 1
+      const virt_text_pos = head_matched && at_eol ?
+            \ 'overlay' : has_inline && !at_eol ? 'inline' : 'eol'
+      const prefix =
+            \ virt_text_pos == 'inline' && word != remaining ? ' ' : ''
       const options = #{
-            \   virt_text: [[word, a:highlight]],
+            \   virt_text: [[prefix . word, a:highlight]],
             \   virt_text_pos: virt_text_pos,
             \   hl_mode: 'combine',
             \   priority: 0,
-            \   right_gravity: !head_matched,
+            \   right_gravity: !at_eol,
             \ }
       call nvim_buf_set_extmark(
             \ 0, s:ddc_namespace, '.'->line() - 1, col, options)
 
-      if !head_matched && has_inline
+      if virt_text_pos == 'inline'
         " It needs update
         autocmd InsertCharPre * ++once call ddc#ui#inline#_hide()
       endif
@@ -100,7 +102,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     const col =
           \ is_cmdline ?
           \   (head_matched ? getcmdpos() : getcmdline()->len()) + 1 :
-          \ head_matched ? '.'->col() : '$'->col() + 1
+          \ head_matched && at_eol ? '.'->col() : '$'->col() + 1
     const winopts = #{
           \   pos: 'topleft',
           \   line: is_cmdline ? cmdline_pos : '.'->line(),
