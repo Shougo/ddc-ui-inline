@@ -43,7 +43,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
         " NOTE: It cannot set in nvim_win_set_config()
         let winopts.noautocmd = v:true
 
-        if !('s:inline_popup_buf'->exists())
+        if !'s:inline_popup_buf'->exists()
           const s:inline_popup_buf = nvim_create_buf(v:false, v:true)
         endif
 
@@ -137,7 +137,7 @@ function! ddc#ui#inline#_hide() abort
     if mode() ==# 'c'
       call nvim_win_close(s:inline_popup_id, v:true)
     else
-      if !('s:ddc_namespace'->exists())
+      if !'s:ddc_namespace'->exists()
         let s:ddc_namespace = nvim_create_namespace('ddc')
       endif
 
