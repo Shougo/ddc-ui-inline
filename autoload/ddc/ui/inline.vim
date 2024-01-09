@@ -3,6 +3,10 @@ function! ddc#ui#inline#visible() abort
 endfunction
 
 function! ddc#ui#inline#_show(pos, items, highlight) abort
+  if mode() ==# 'n'
+    return
+  endif
+
   const complete_str = ddc#util#get_input('')[a:pos :]
   const remaining = a:items[0].word[complete_str->len():]
 
