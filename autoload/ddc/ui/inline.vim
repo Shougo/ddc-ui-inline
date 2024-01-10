@@ -3,6 +3,8 @@ function! ddc#ui#inline#visible() abort
 endfunction
 
 function! ddc#ui#inline#_show(pos, items, highlight) abort
+  " NOTE: When doing a change motion (i.e. cwabc<esc>) and repeating with ".",
+  " it would trigger.
   if mode() ==# 'n'
     return
   endif
