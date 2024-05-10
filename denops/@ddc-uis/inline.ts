@@ -1,6 +1,6 @@
-import { Context, DdcItem } from "https://deno.land/x/ddc_vim@v4.3.1/types.ts";
-import { BaseUi } from "https://deno.land/x/ddc_vim@v4.3.1/base/ui.ts";
-import { Denops, fn } from "https://deno.land/x/ddc_vim@v4.3.1/deps.ts";
+import { Context, DdcItem } from "https://deno.land/x/ddc_vim@v5.0.0/types.ts";
+import { BaseUi } from "https://deno.land/x/ddc_vim@v5.0.0/base/ui.ts";
+import { Denops, fn } from "https://deno.land/x/ddc_vim@v5.0.0/deps.ts";
 
 export type Params = {
   highlight: string;
