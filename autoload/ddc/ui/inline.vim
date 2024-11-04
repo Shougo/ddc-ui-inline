@@ -31,7 +31,11 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   if has('nvim')
     if is_cmdline
       " Use floating window
-      const col = (head_matched ? getcmdpos() : getcmdline()->len()) + 1
+      let col = head_matched ? getcmdpos() : getcmdline()->len()
+      let col += exists('*getcmdprompt') && getcmdprompt() !=# ''
+            \ ? getcmdprompt()->len() - 1
+            \ : 1
+
       let winopts = #{
             \   relative: 'editor',
             \   width: word->strdisplaywidth(),
@@ -105,10 +109,16 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     endif
   else
     " Use popup window instead
-    const col =
+    let col =
           \ is_cmdline ?
-          \   (head_matched ? getcmdpos() : getcmdline()->len()) + 1 :
+          \   (head_matched ? getcmdpos() : getcmdline()->len()) :
           \ head_matched && at_eol ? '.'->col() : '$'->col() + 1
+    if is_cmdline
+      let col += exists('*getcmdprompt') && getcmdprompt() !=# ''
+            \ ? getcmdprompt()->len() - 1
+            \ : 1
+    endif
+
     const winopts = #{
           \   pos: 'topleft',
           \   line: is_cmdline ? cmdline_pos : '.'->line(),
