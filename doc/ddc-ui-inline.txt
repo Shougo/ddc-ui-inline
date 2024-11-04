@@ -19,7 +19,8 @@ This UI displayes items inline.
 Use virtual text by |nvim_buf_set_extmark()| in neovim or use |popup_create()|
 in Vim.
 
-Note: It does not work if the completion menu is already displayed.
+NOTE: It does not work if the completion menu is already
+displayed(|pumvisible()| or |pum#visible()|).
 
 ==============================================================================
 INSTALL						*ddc-ui-inline-install*
