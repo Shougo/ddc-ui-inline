@@ -86,10 +86,16 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
 
       " Use virtual text
       const col = '.'->col() - 1
-      const virt_text_pos = head_matched && at_eol ?
-            \ 'overlay' : has_inline && !at_eol ? 'inline' : 'eol'
+      const virt_text_pos =
+            \   head_matched && at_eol
+            \ ? 'overlay'
+            \ : has_inline && !at_eol
+            \ ? 'inline'
+            \ : 'eol'
       const prefix =
-            \ virt_text_pos == 'inline' && word != remaining ? ' ' : ''
+            \ virt_text_pos == 'inline' && word != remaining
+            \ ? ' '
+            \ : ''
       const options = #{
             \   virt_text: [[prefix . word, a:highlight]],
             \   virt_text_pos: virt_text_pos,
@@ -190,13 +196,18 @@ function s:get_cmdline_pos(head_matched) abort
     let pos[1] += cmdline_left
 
     let row = pos[0]
+    if has('nvim')
+      let row -= 1
+    endif
+
     let col = cmdline#_get().prompt->strlen() + pos[1]
     if !has('nvim')
       let col += 1
     endif
   else
     let row = &lines - [1, &cmdheight]->max()
-    let col = exists('*getcmdprompt') && getcmdprompt() !=# ''
+    let col =
+          \   exists('*getcmdprompt') && getcmdprompt() !=# ''
           \ ? getcmdprompt()->len() - 1
           \ : 1
   endif
