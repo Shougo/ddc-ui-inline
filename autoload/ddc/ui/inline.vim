@@ -20,30 +20,30 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   const is_cmdline = mode() ==# 'c'
 
   " Head matched: Follow cursor text
+  const at_eol =
+        \   is_cmdline
+        \ ? getcmdpos() == getcmdline()->len() + 1
+        \ : '.'->col() == '$'->col()
+  const has_inline = has('nvim-0.10')
   const head_matched = a:items[0].word->stridx(complete_str) == 0
         \ && (!is_cmdline || getcmdpos() == getcmdline()->len() + 1)
-  const at_eol = '.'->col() == '$'->col()
-  const has_inline = has('nvim-0.10')
-  const word = head_matched && (has_inline || at_eol)
-        \ ? remaining : a:items[0].word
-  const cmdline_pos = &lines - [1, &cmdheight]->max()
+        \ && (has_inline || at_eol)
+  const word = head_matched ? remaining : a:items[0].word
 
   if has('nvim')
     if is_cmdline
       " Use floating window
-      let col = head_matched ? getcmdpos() : getcmdline()->len()
-      let col += exists('*getcmdprompt') && getcmdprompt() !=# ''
-            \ ? getcmdprompt()->len() - 1
-            \ : 1
+      let [row, col] = s:get_cmdline_pos(head_matched)
 
       let winopts = #{
             \   relative: 'editor',
             \   width: word->strdisplaywidth(),
             \   height: 1,
-            \   row: cmdline_pos,
+            \   row: row,
             \   col: col,
             \   anchor: 'NW',
             \   style: 'minimal',
+            \   zindex: 9999,
             \ }
 
       if ddc#ui#inline#visible()
@@ -109,21 +109,19 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     endif
   else
     " Use popup window instead
-    let col =
-          \ is_cmdline ?
-          \   (head_matched ? getcmdpos() : getcmdline()->len()) :
-          \ head_matched && at_eol ? '.'->col() : '$'->col() + 1
     if is_cmdline
-      let col += exists('*getcmdprompt') && getcmdprompt() !=# ''
-            \ ? getcmdprompt()->len() - 1
-            \ : 1
+      let [row, col] = s:get_cmdline_pos(head_matched)
+    else
+      let row = '.'->line()
+      let col = head_matched ? '.'->col() : '$'->col() + 1
     endif
 
     const winopts = #{
           \   pos: 'topleft',
-          \   line: is_cmdline ? cmdline_pos : '.'->line(),
+          \   line: row,
           \   col: col,
           \   highlight: a:highlight,
+          \   zindex: 9999,
           \ }
 
     if ddc#ui#inline#visible()
@@ -139,9 +137,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
     autocmd ddc CmdlineLeave <buffer> ++once call ddc#ui#inline#_hide()
   endif
 
-  if !has('nvim') || is_cmdline
-    redraw
-  endif
+  redraw
 endfunction
 
 function! ddc#ui#inline#_hide() abort
@@ -166,4 +162,46 @@ function! ddc#ui#inline#_hide() abort
   redraw
 
   let s:inline_popup_id = -1
+endfunction
+
+" returns [border_left, border_top, border_right, border_bottom]
+function s:get_border_size(border) abort
+  if a:border->type() == v:t_string
+    return a:border ==# 'none' ? [0, 0, 0, 0] : [1, 1, 1, 1]
+  elseif a:border->type() == v:t_list && !a:border->empty()
+    return [
+          \   s:get_borderchar_width(a:border[3 % len(a:border)]),
+          \   s:get_borderchar_height(a:border[1 % len(a:border)]),
+          \   s:get_borderchar_width(a:border[7 % len(a:border)]),
+          \   s:get_borderchar_height(a:border[5 % len(a:border)]),
+          \ ]
+  else
+    return [0, 0, 0, 0]
+  endif
+endfunction
+
+function s:get_cmdline_pos(head_matched) abort
+  if '*cmdline#_get'->exists() && !cmdline#_get().pos->empty()
+    const [cmdline_left, cmdline_top, cmdline_right, cmdline_bottom]
+          \ = s:get_border_size(cmdline#_options().border)
+
+    let pos = cmdline#_get().pos->copy()
+    let pos[0] += cmdline_top + cmdline_bottom
+    let pos[1] += cmdline_left
+
+    let row = pos[0]
+    let col = cmdline#_get().prompt->strlen() + pos[1]
+    if !has('nvim')
+      let col += 1
+    endif
+  else
+    let row = &lines - [1, &cmdheight]->max()
+    let col = exists('*getcmdprompt') && getcmdprompt() !=# ''
+          \ ? getcmdprompt()->len() - 1
+          \ : 1
+  endif
+
+  let col += a:head_matched ? getcmdpos() : getcmdline()->len()
+
+  return [row, col]
 endfunction
