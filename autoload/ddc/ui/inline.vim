@@ -151,23 +151,33 @@ function! ddc#ui#inline#_hide() abort
     return
   endif
 
-  if has('nvim')
-    if mode() ==# 'c'
-      call nvim_win_close(s:inline_popup_id, v:true)
-    else
-      if !'s:ddc_namespace'->exists()
-        let s:ddc_namespace = nvim_create_namespace('ddc')
-      endif
-
-      call nvim_buf_clear_namespace('%'->bufnr(), s:ddc_namespace, 0, -1)
-    endif
-  else
-    call popup_close(s:inline_popup_id)
-  endif
-
-  redraw
+  call s:close_popup(s:inline_popup_id)
 
   let s:inline_popup_id = -1
+endfunction
+function! s:close_popup(id) abort
+  try
+    if has('nvim')
+      if mode() ==# 'c'
+        call nvim_win_close(a:id, v:true)
+      else
+        if !'s:ddc_namespace'->exists()
+          let s:ddc_namespace = nvim_create_namespace('ddc')
+        endif
+
+        call nvim_buf_clear_namespace('%'->bufnr(), s:ddc_namespace, 0, -1)
+      endif
+    else
+      call popup_close(a:id)
+    endif
+
+    redraw
+  catch /E523:\|E565:\|E5555:\|E994:/
+    " Ignore "Not allowed here"
+
+    " Close the popup window later
+    call timer_start(100, { -> s:close_popup(a:id) })
+  endtry
 endfunction
 
 " returns [border_left, border_top, border_right, border_bottom]
