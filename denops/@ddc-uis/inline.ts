@@ -48,7 +48,7 @@ export class Ui extends BaseUi<Params> {
 
   override params(): Params {
     return {
-      highlight: "Comment",
+      highlight: "NonText",
     };
   }
 }

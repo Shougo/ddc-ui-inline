@@ -49,7 +49,7 @@ PARAMS							*ddc-ui-inline-params*
 highlight	(string)
 		The highlight of |ddc-option-completionMode|'s inline text.
 
-		Default: "Comment"
+		Default: "NonText"
 
 
 ==============================================================================
