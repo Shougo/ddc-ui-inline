@@ -119,7 +119,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       let [row, col] = s:get_cmdline_pos(head_matched)
     else
       let row = '.'->line()
-      let col = head_matched ? '.'->col() : '$'->col() + 1
+      let col = head_matched ? '.'->col() + 1 : '$'->col() + 1
     endif
 
     const winopts = #{
