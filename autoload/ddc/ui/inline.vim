@@ -218,11 +218,14 @@ function s:get_cmdline_pos(head_matched) abort
     let row = &lines - [1, &cmdheight]->max()
     let col =
           \   exists('*getcmdprompt') && getcmdprompt() !=# ''
-          \ ? getcmdprompt()->len() - 1
+          \ ? getcmdprompt()->len()
           \ : 1
+    if !has('nvim')
+      let col += 1
+    endif
   endif
 
-  let col += a:head_matched ? getcmdpos() : getcmdline()->len()
+  let col += a:head_matched ? getcmdpos() - 1 : getcmdline()->len() + 1
 
   return [row, col]
 endfunction
