@@ -210,7 +210,7 @@ function s:get_cmdline_pos(head_matched) abort
       let row -= 1
     endif
 
-    let col = cmdline#_get().prompt->strlen() + pos[1]
+    let col = cmdline#_get().prompt->strlen() + pos[1] + 1
   else
     let row = &lines - [1, &cmdheight]->max()
     let col =
