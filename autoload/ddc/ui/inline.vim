@@ -93,11 +93,11 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
             \ ? 'inline'
             \ : 'eol'
       const prefix =
-            \ virt_text_pos == 'inline' && word != remaining
+            \ virt_text_pos == 'inline' && word !=# remaining
             \ ? ' '
             \ : ''
       const options = #{
-            \   virt_text: [[prefix . word, a:highlight]],
+            \   virt_text: [[prefix .. word, a:highlight]],
             \   virt_text_pos: virt_text_pos,
             \   hl_mode: 'combine',
             \   priority: 0,
@@ -106,7 +106,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       call nvim_buf_set_extmark(
             \ 0, s:ddc_namespace, '.'->line() - 1, col, options)
 
-      if virt_text_pos == 'inline'
+      if virt_text_pos ==# 'inline'
         " It needs update
         autocmd InsertCharPre * ++once call ddc#ui#inline#_hide()
       endif
