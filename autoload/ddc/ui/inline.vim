@@ -24,10 +24,8 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
         \   is_cmdline
         \ ? getcmdpos() == getcmdline()->len() + 1
         \ : '.'->col() == '$'->col()
-  const has_inline = has('nvim-0.10')
   const head_matched = a:items[0].word->stridx(complete_str) == 0
         \ && (!is_cmdline || getcmdpos() == getcmdline()->len() + 1)
-        \ && (has_inline || at_eol)
   const word = head_matched ? remaining : a:items[0].word
 
   if has('nvim')
@@ -89,7 +87,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       const virt_text_pos =
             \   head_matched && at_eol
             \ ? 'overlay'
-            \ : has_inline && !at_eol
+            \ : !at_eol
             \ ? 'inline'
             \ : 'eol'
       const prefix =
