@@ -2,7 +2,7 @@ function! ddc#ui#inline#visible() abort
   return s:->get('inline_popup_id', -1) > 0
 endfunction
 
-function! ddc#ui#inline#_show(pos, items, highlight) abort
+function! ddc#ui#inline#_show(pos, items, params) abort
   " NOTE: When doing a change motion (i.e. cwabc<esc>) and repeating with ".",
   " it would trigger.
   if mode() ==# 'n'
@@ -10,7 +10,10 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
   endif
 
   const complete_str = ddc#util#get_input('')[a:pos :]
-  const remaining = a:items[0].word[complete_str->len():]
+  const next_input = ddc#util#get_next_input('')
+  const next_word = next_input->matchstr('\w\+$')
+  const item_word = a:items[0].word
+  const remaining = item_word[complete_str->len():]
 
   if a:items->empty() || remaining ==# ''
     call ddc#ui#inline#_hide()
@@ -19,14 +22,21 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
 
   const is_cmdline = mode() ==# 'c'
 
-  " Head matched: Follow cursor text
   const at_eol =
         \   is_cmdline
         \ ? getcmdpos() == getcmdline()->len() + 1
         \ : '.'->col() == '$'->col()
-  const head_matched = a:items[0].word->stridx(complete_str) == 0
+
+  " Head matched: Follow cursor text
+  let head_matched = a:items[0].word->stridx(complete_str) == 0
         \ && (!is_cmdline || getcmdpos() == getcmdline()->len() + 1)
-  const word = head_matched ? remaining : a:items[0].word
+  if a:params.checkNextWordMatched && head_matched && next_word !=# ''
+    const next_word_pos = item_word->strridx(next_word)
+    let head_matched =
+          \ next_word_pos ==# item_word->len() - next_word->len()
+  endif
+
+  const word = head_matched ? remaining : item_word
 
   if has('nvim')
     if is_cmdline
@@ -59,7 +69,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
               \ s:inline_popup_buf, v:false, winopts)
 
         " NOTE: nvim_win_set_option() causes title flicker...
-        let highlight = 'Normal:' .. a:highlight
+        let highlight = 'Normal:' .. a:params.highlight
         if &hlsearch
           " Disable 'hlsearch' highlight
           let highlight ..= ',Search:None,CurSearch:None'
@@ -87,7 +97,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
       const virt_text_pos =
             \   head_matched && at_eol
             \ ? 'overlay'
-            \ : !at_eol
+            \ : head_matched && !at_eol
             \ ? 'inline'
             \ : 'eol'
       const prefix =
@@ -95,7 +105,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
             \ ? ' '
             \ : ''
       const options = #{
-            \   virt_text: [[prefix .. word, a:highlight]],
+            \   virt_text: [[prefix .. word, a:params.highlight]],
             \   virt_text_pos: virt_text_pos,
             \   hl_mode: 'combine',
             \   priority: 0,
@@ -124,7 +134,7 @@ function! ddc#ui#inline#_show(pos, items, highlight) abort
           \   pos: 'topleft',
           \   line: row,
           \   col: col,
-          \   highlight: a:highlight,
+          \   highlight: a:params.highlight,
           \   zindex: 9999,
           \ }
 

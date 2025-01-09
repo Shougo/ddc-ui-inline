@@ -3,7 +3,7 @@
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS					*ddc-ui-inline-contents*
+CONTENTS                                              *ddc-ui-inline-contents*
 
 Introduction		|ddc-ui-inline-introduction|
 Install			|ddc-ui-inline-install|
@@ -12,7 +12,7 @@ Params			|ddc-ui-inline-params|
 
 
 ==============================================================================
-INTRODUCTION					*ddc-ui-inline-introduction*
+INTRODUCTION                                      *ddc-ui-inline-introduction*
 
 This UI displayes items inline.
 
@@ -23,7 +23,7 @@ NOTE: It does not work if the completion menu is already
 displayed(|pumvisible()| or |pum#visible()|).
 
 ==============================================================================
-INSTALL						*ddc-ui-inline-install*
+INSTALL                                                *ddc-ui-inline-install*
 
 Please install both "ddc.vim" and "denops.vim".
 
@@ -32,9 +32,8 @@ https://github.com/vim-denops/denops.vim
 
 
 ==============================================================================
-EXAMPLES					*ddc-ui-inline-examples*
->
->
+EXAMPLES                                              *ddc-ui-inline-examples*
+>vim
 	call ddc#custom#patch_global('ui', 'inline')
 	inoremap <expr><C-t>       ddc#map#insert_item(0, "\<C-e>")
 
@@ -43,9 +42,16 @@ EXAMPLES					*ddc-ui-inline-examples*
 <
 
 ==============================================================================
-PARAMS							*ddc-ui-inline-params*
+PARAMS                                                  *ddc-ui-inline-params*
 
-				*ddc-ui-inline-param-highlight*
+                                    *ddc-ui-inline-param-checkNextWordMatched*
+checkNextWordMatched	(boolean)
+		If it is enabled, ddc-ui-inline checks the word after cursor
+		is matched.
+
+		Default: v:false
+
+                                               *ddc-ui-inline-param-highlight*
 highlight	(string)
 		The highlight of |ddc-option-completionMode|'s inline text.
 
