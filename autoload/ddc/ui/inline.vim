@@ -150,6 +150,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     " NOTE: ddc#hide() does not work.  I don't know why.
     autocmd ddc CmdlineLeave <buffer> ++once call ddc#ui#inline#_hide()
   endif
+  autocmd ddc ModeChanged <buffer> ++once call ddc#ui#inline#_hide()
 
   redraw
 endfunction
