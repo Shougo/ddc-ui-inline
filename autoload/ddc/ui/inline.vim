@@ -79,6 +79,8 @@ function! ddc#ui#inline#_show(pos, items, params) abort
         call nvim_win_set_option(
               \ s:inline_popup_id, 'wrap', v:false)
         call nvim_win_set_option(
+              \ s:inline_popup_id, 'list', v:false)
+        call nvim_win_set_option(
               \ s:inline_popup_id, 'scrolloff', 0)
         call nvim_win_set_option(
               \ s:inline_popup_id, 'statusline', &l:statusline)
