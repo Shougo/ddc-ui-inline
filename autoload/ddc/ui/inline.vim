@@ -121,6 +121,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
         autocmd InsertCharPre * ++once call ddc#ui#inline#_hide()
       endif
 
+      " Dummy
       let s:inline_popup_id = 1
     endif
   else
@@ -169,9 +170,10 @@ endfunction
 function! s:close_popup(id) abort
   try
     if has('nvim')
-      if mode() ==# 'c'
+      if a:id > 1
         call nvim_win_close(a:id, v:true)
       else
+        " Virtual text
         if !'s:ddc_namespace'->exists()
           let s:ddc_namespace = nvim_create_namespace('ddc')
         endif
