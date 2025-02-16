@@ -2,6 +2,7 @@ function! ddc#ui#inline#visible() abort
   return s:->get('inline_popup_id', -1) > 0
 endfunction
 
+const s:inline_prop_type = 'ddc-ui-inline'
 function! ddc#ui#inline#_show(pos, items, params) abort
   " NOTE: When doing a change motion (i.e. cwabc<esc>) and repeating with ".",
   " it would trigger.
@@ -123,6 +124,25 @@ function! ddc#ui#inline#_show(pos, items, params) abort
       " Dummy
       let s:inline_popup_id = 1
     endif
+  elseif !is_cmdline && !at_eol
+    " Use textprop
+    if s:inline_prop_type->prop_type_get(#{ bufnr: bufnr() })->empty()
+      call prop_type_add(s:inline_prop_type, #{
+            \   bufnr: bufnr(),
+            \   highlight: a:params.highlight,
+            \ })
+    endif
+
+    let row = '.'->line()
+    let col = head_matched ? '.'->col() : '.'->col() + 1
+    call prop_add(row, col, #{
+          \   type: s:inline_prop_type,
+          \   bufnr: bufnr(),
+          \   text: head_matched ? word : word .. ' ',
+          \ })
+
+    " Dummy
+    let s:inline_popup_id = 1
   else
     " Use popup window instead
     if is_cmdline
@@ -183,10 +203,15 @@ function! s:close_popup(id) abort
           let s:ddc_namespace = nvim_create_namespace('ddc')
         endif
 
-        call nvim_buf_clear_namespace('%'->bufnr(), s:ddc_namespace, 0, -1)
+        call nvim_buf_clear_namespace(bufnr(), s:ddc_namespace, 0, -1)
       endif
     else
-      call popup_close(a:id)
+      if a:id > 1
+        call popup_close(a:id)
+      else
+        " Clear all properties
+        call prop_clear(1, '$'->line())
+      endif
     endif
 
     redraw
