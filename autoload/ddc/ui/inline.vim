@@ -129,7 +129,13 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     if is_cmdline
       let [row, col] = s:get_cmdline_pos(head_matched)
     else
-      let row = '.'->line()
+      const linenr = '.'->line()
+      let row =
+            \   at_eol
+            \ ? linenr
+            \ : linenr == 1
+            \ ? linenr + 1
+            \ : linenr - 1
       let col = head_matched ? '.'->col() + 1 : '$'->col() + 1
     endif
 
