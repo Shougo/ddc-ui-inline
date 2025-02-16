@@ -29,7 +29,6 @@ function! ddc#ui#inline#_show(pos, items, params) abort
 
   " Head matched: Follow cursor text
   let head_matched = a:items[0].word->stridx(complete_str) == 0
-        \ && (!is_cmdline || getcmdpos() == getcmdline()->len() + 1)
   if a:params.checkNextWordMatched && head_matched && next_word !=# ''
     const next_word_pos = item_word->strridx(next_word)
     let head_matched =
@@ -41,7 +40,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   if has('nvim')
     if is_cmdline
       " Use floating window
-      let [row, col] = s:get_cmdline_pos(head_matched)
+      let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
 
       let winopts = #{
             \   relative: 'editor',
@@ -127,7 +126,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   else
     " Use popup window instead
     if is_cmdline
-      let [row, col] = s:get_cmdline_pos(head_matched)
+      let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
     else
       const linenr = '.'->line()
       let row =
@@ -215,7 +214,7 @@ function s:get_border_size(border) abort
   endif
 endfunction
 
-function s:get_cmdline_pos(head_matched) abort
+function s:get_cmdline_pos(head_matched, at_eol) abort
   if '*cmdline#_get'->exists() && !cmdline#_get().pos->empty()
     const [cmdline_left, cmdline_top, cmdline_right, cmdline_bottom]
           \ = s:get_border_size(cmdline#_options().border)
@@ -241,6 +240,14 @@ function s:get_cmdline_pos(head_matched) abort
   let col += a:head_matched ? getcmdpos() - 1 : getcmdline()->len() + 1
   if !has('nvim')
     let col += 1
+  endif
+
+  if !a:at_eol
+    if row > 1
+      let row -= 1
+    else
+      let row += 1
+    endif
   endif
 
   return [row, col]
