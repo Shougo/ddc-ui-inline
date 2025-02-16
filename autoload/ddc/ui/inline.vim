@@ -99,11 +99,11 @@ function! ddc#ui#inline#_show(pos, items, params) abort
       const virt_text_pos =
             \   head_matched && at_eol
             \ ? 'overlay'
-            \ : head_matched && !at_eol
-            \ ? 'inline'
-            \ : 'eol'
+            \ : at_eol
+            \ ? 'eol'
+            \ : 'inline'
       const prefix =
-            \ virt_text_pos == 'inline' && word !=# remaining
+            \   virt_text_pos == 'inline' && word !=# remaining
             \ ? ' '
             \ : ''
       const options = #{
