@@ -50,7 +50,7 @@ export class Ui extends BaseUi<Params> {
   override params(): Params {
     return {
       checkNextWordMatched: false,
-      highlight: "NonText",
+      highlight: "ComplMatchIns",
     };
   }
 }

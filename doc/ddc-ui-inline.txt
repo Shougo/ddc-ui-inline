@@ -55,7 +55,7 @@ checkNextWordMatched	(boolean)
 highlight	(string)
 		The highlight of |ddc-option-completionMode|'s inline text.
 
-		Default: "NonText"
+		Default: "ComplMatchIns"
 
 
 ==============================================================================
