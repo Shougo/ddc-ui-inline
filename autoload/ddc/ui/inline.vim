@@ -116,11 +116,6 @@ function! ddc#ui#inline#_show(pos, items, params) abort
       call nvim_buf_set_extmark(
             \ 0, s:ddc_namespace, '.'->line() - 1, col, options)
 
-      if virt_text_pos ==# 'inline'
-        " It needs update
-        autocmd InsertCharPre * ++once call ddc#ui#inline#_hide()
-      endif
-
       " Dummy
       let s:inline_popup_id = 1
     endif
