@@ -178,8 +178,13 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     " NOTE: ddc#hide() does not work.  I don't know why.
     autocmd ddc CmdlineLeave <buffer> ++once call ddc#ui#inline#_hide()
     if '##CursorMovedC'->exists()
-      autocmd ddc CursorMovedC * ++once ++nested call ddc#ui#inline#_hide()
+      autocmd ddc CursorMovedC * ++once ++nested call s:check_cmdline()
     endif
+
+    let s:prev_cmdline = #{
+          \   text: getcmdline(),
+          \   col: getcmdpos(),
+          \ }
   endif
   autocmd ddc ModeChanged <buffer> ++once call ddc#ui#inline#_hide()
 
@@ -283,4 +288,11 @@ function s:get_cmdline_pos(head_matched, at_eol) abort
   endif
 
   return [row, col]
+endfunction
+
+function! s:check_cmdline() abort
+  if s:prev_cmdline.text ==# getcmdline()
+        \ && s:prev_cmdline.col !=# getcmdpos()
+    call ddc#ui#inline#_hide()
+  endif
 endfunction
