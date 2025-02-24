@@ -177,6 +177,9 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   if is_cmdline
     " NOTE: ddc#hide() does not work.  I don't know why.
     autocmd ddc CmdlineLeave <buffer> ++once call ddc#ui#inline#_hide()
+    if '##CursorMovedC'->exists()
+      autocmd ddc CursorMovedC * ++once ++nested call ddc#ui#inline#_hide()
+    endif
   endif
   autocmd ddc ModeChanged <buffer> ++once call ddc#ui#inline#_hide()
 
