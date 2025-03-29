@@ -44,6 +44,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
       let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
 
       let winopts = #{
+            \   border: 'none',
             \   relative: 'editor',
             \   width: word->strdisplaywidth(),
             \   height: 1,
