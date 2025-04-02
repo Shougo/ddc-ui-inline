@@ -36,7 +36,9 @@ function! ddc#ui#inline#_show(pos, items, params) abort
           \ next_word_pos ==# item_word->len() - next_word->len()
   endif
 
-  const word = head_matched ? remaining : item_word
+  const word = (head_matched ? remaining : item_word)
+        \ ->ddc#ui#inline#_truncate(
+        \   a:params.maxWidth, a:params.maxWidth / 3, '...')
 
   if has('nvim')
     if is_cmdline
@@ -291,4 +293,45 @@ function! s:check_cmdline() abort
         \ && s:prev_cmdline.col !=# getcmdpos()
     call ddc#ui#inline#_hide()
   endif
+endfunction
+
+function ddc#ui#inline#_truncate(str, max, footer_width, separator) abort
+  const width = a:str->strwidth()
+  if width <= a:max
+    const ret = a:str
+  else
+    const header_width = a:max - a:separator->strwidth() - a:footer_width
+    const ret = s:strwidthpart(a:str, header_width) .. a:separator
+         \ .. s:strwidthpart_reverse(a:str, a:footer_width)
+  endif
+  return s:truncate(ret, a:max)
+endfunction
+function s:truncate(str, width) abort
+  " Original function is from mattn.
+  " http://github.com/mattn/googlereader-vim/tree/master
+
+  if a:str =~# '^[\x00-\x7f]*$'
+    return a:str->len() < a:width
+          \ ? printf('%-' .. a:width .. 's', a:str)
+          \ : a:str->strpart(0, a:width)
+  endif
+
+  let ret = a:str
+  let width = a:str->strwidth()
+  if width > a:width
+    let ret = s:strwidthpart(ret, a:width)
+    let width = ret->strwidth()
+  endif
+
+  return ret
+endfunction
+function s:strwidthpart(str, width) abort
+  const str = a:str->tr("\t", ' ')
+  const vcol = a:width + 2
+  return str->matchstr('.*\%<' .. (vcol < 0 ? 0 : vcol) .. 'v')
+endfunction
+function s:strwidthpart_reverse(str, width) abort
+  const str = a:str->tr("\t", ' ')
+  const vcol = str->strwidth() - a:width
+  return str->matchstr('\%>' .. (vcol < 0 ? 0 : vcol) .. 'v.*')
 endfunction

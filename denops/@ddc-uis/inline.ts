@@ -1,12 +1,13 @@
-import { type Context, type DdcItem } from "jsr:@shougo/ddc-vim@~9.1.0/types";
-import { BaseUi } from "jsr:@shougo/ddc-vim@~9.1.0/ui";
+import { type Context, type DdcItem } from "jsr:@shougo/ddc-vim@~9.4.0/types";
+import { BaseUi } from "jsr:@shougo/ddc-vim@~9.4.0/ui";
 
 import type { Denops } from "jsr:@denops/core@~7.0.0";
-import * as fn from "jsr:@denops/std@~7.4.0/function";
+import * as fn from "jsr:@denops/std@~7.5.0/function";
 
 export type Params = {
   checkNextWordMatched: boolean;
   highlight: string;
+  maxWidth: number;
 };
 
 export class Ui extends BaseUi<Params> {
@@ -51,6 +52,7 @@ export class Ui extends BaseUi<Params> {
     return {
       checkNextWordMatched: false,
       highlight: "ComplMatchIns",
+      maxWidth: 200,
     };
   }
 }
