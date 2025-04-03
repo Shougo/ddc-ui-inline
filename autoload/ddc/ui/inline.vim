@@ -298,12 +298,12 @@ endfunction
 function ddc#ui#inline#_truncate(str, max, footer_width, separator) abort
   const width = a:str->strwidth()
   if width <= a:max
-    const ret = a:str
-  else
-    const header_width = a:max - a:separator->strwidth() - a:footer_width
-    const ret = s:strwidthpart(a:str, header_width) .. a:separator
-         \ .. s:strwidthpart_reverse(a:str, a:footer_width)
+    return a:str
   endif
+
+  const header_width = a:max - a:separator->strwidth() - a:footer_width
+  const ret = s:strwidthpart(a:str, header_width) .. a:separator
+       \ .. s:strwidthpart_reverse(a:str, a:footer_width)
   return s:truncate(ret, a:max)
 endfunction
 function s:truncate(str, width) abort
