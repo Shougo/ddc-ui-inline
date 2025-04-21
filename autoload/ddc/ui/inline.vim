@@ -132,7 +132,10 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     endif
 
     let row = '.'->line()
-    let col = head_matched ? '.'->col() : '.'->col() + 1
+    let col =
+          \ head_matched
+          \ ? '.'->col()
+          \ : '.'->col() + 1
     call prop_add(row, col, #{
           \   type: s:inline_prop_type,
           \   bufnr: bufnr(),
@@ -153,7 +156,10 @@ function! ddc#ui#inline#_show(pos, items, params) abort
             \ : linenr == 1
             \ ? linenr + 1
             \ : linenr - 1
-      let col = head_matched ? '.'->col() + 1 : '$'->col() + 1
+      let col =
+            \   head_matched
+            \ ? ddc#util#get_input()->strwidth() + 2
+            \ : ddc#util#get_text()->strwidth() + 3
     endif
 
     const winopts = #{
