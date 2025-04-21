@@ -156,6 +156,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
             \ : linenr == 1
             \ ? linenr + 1
             \ : linenr - 1
+      " NOTE: col() does not work for multibyte characters.
       let col =
             \   head_matched
             \ ? ddc#util#get_input()->strwidth() + 2
