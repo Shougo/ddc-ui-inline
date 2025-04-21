@@ -267,7 +267,7 @@ function s:get_cmdline_pos(head_matched, at_eol) abort
       endif
     endif
 
-    let col = cmdline#_get().prompt->len() + pos[1] + 1
+    let col = pos[1] + 1
     let col += a:head_matched ? getcmdpos() - 1 : getcmdline()->len() + 1
     " Use getcmdscreenpos() for adjustment
     let col += getcmdscreenpos() - getcmdpos()
