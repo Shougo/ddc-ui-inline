@@ -149,13 +149,8 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     if is_cmdline
       let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
     else
-      const linenr = '.'->line()
-      let row =
-            \   at_eol
-            \ ? linenr
-            \ : linenr == 1
-            \ ? linenr + 1
-            \ : linenr - 1
+      const spos = screenpos(0, '.'->line(), getcurpos()[2])
+      let row = spos.row
       " NOTE: col() does not work for multibyte characters.
       let col =
             \   head_matched
