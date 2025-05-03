@@ -269,8 +269,7 @@ function s:get_cmdline_pos(head_matched, at_eol) abort
       endif
     endif
 
-    " Use getcmdscreenpos() for adjustment
-    const adjustment = getcmdscreenpos() - getcmdpos()
+    const adjustment = getcmdprompt()->len()
 
     let col = pos[1] + 1
     let col += a:head_matched ? getcmdpos() - 1 : getcmdline()->len() + 1
@@ -280,7 +279,7 @@ function s:get_cmdline_pos(head_matched, at_eol) abort
     endif
   else
     let row = &lines - [1, &cmdheight]->max()
-    let col = getcmdscreenpos() - 1
+    let col = getcmdpos() + getcmdprompt()->len()
     if !a:head_matched
       let col += 1
     endif
