@@ -17,7 +17,6 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   const remaining = item_word[complete_str->len():]
 
   if a:items->empty() || remaining ==# ''
-    call ddc#ui#inline#_hide()
     return
   endif
 
@@ -123,6 +122,9 @@ function! ddc#ui#inline#_show(pos, items, params) abort
       let s:inline_popup_id = 1
     endif
   elseif !is_cmdline && !at_eol
+    " Hide the previous popup
+    call ddc#ui#inline#_hide()
+
     " Use textprop
     if s:inline_prop_type->prop_type_get(#{ bufnr: bufnr() })->empty()
       call prop_type_add(s:inline_prop_type, #{
