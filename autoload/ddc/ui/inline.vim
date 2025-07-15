@@ -42,7 +42,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   if has('nvim')
     if is_cmdline
       " Use floating window
-      let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
+      let [row, col] = s:get_cmdline_pos(head_matched, at_eol, word)
 
       let winopts = #{
             \   border: 'none',
@@ -149,7 +149,7 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   else
     " Use popup window instead
     if is_cmdline
-      let [row, col] = s:get_cmdline_pos(head_matched, at_eol)
+      let [row, col] = s:get_cmdline_pos(head_matched, at_eol, word)
     else
       const spos = screenpos(0, '.'->line(), getcurpos()[2])
       let row = spos.row
@@ -249,7 +249,7 @@ function s:get_border_size(border) abort
   endif
 endfunction
 
-function s:get_cmdline_pos(head_matched, at_eol) abort
+function s:get_cmdline_pos(head_matched, at_eol, word) abort
   if '*cmdline#_get'->exists() && !cmdline#_get().pos->empty()
     const [cmdline_left, cmdline_top, cmdline_right, cmdline_bottom]
           \ = s:get_border_size(cmdline#_options().border)
@@ -290,6 +290,8 @@ function s:get_cmdline_pos(head_matched, at_eol) abort
       let row -= 1
     endif
   endif
+
+  let col += a:word->strdisplaywidth()
 
   if !has('nvim')
     let col += 1
