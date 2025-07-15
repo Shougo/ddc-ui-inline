@@ -6,6 +6,7 @@ const s:inline_prop_type = 'ddc-ui-inline'
 function! ddc#ui#inline#_show(pos, items, params) abort
   " NOTE: When doing a change motion (i.e. cwabc<esc>) and repeating with ".",
   " it would trigger.
+
   if mode() ==# 'n'
     return
   endif
@@ -15,10 +16,6 @@ function! ddc#ui#inline#_show(pos, items, params) abort
   const next_word = next_input->matchstr('\w\+$')
   const item_word = a:items[0].word
   const remaining = item_word[complete_str->len():]
-
-  if a:items->empty() || remaining ==# ''
-    return
-  endif
 
   const is_cmdline = mode() ==# 'c'
 
@@ -33,6 +30,10 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     const next_word_pos = item_word->strridx(next_word)
     let head_matched =
           \ next_word_pos ==# item_word->len() - next_word->len()
+  endif
+
+  if a:items->empty() || (head_matched && remaining ==# '')
+    return
   endif
 
   const word = (head_matched ? remaining : item_word)
@@ -281,7 +282,11 @@ function s:get_cmdline_pos(head_matched, at_eol, word) abort
     endif
   else
     let row = &lines - [1, &cmdheight]->max()
-    let col = getcmdpos() + [getcmdprompt()->len(), 1]->max() - 1
+    const cmdpos_bytes =
+          \   getcmdpos() > 1
+          \ ? getcmdline()[: getcmdpos() - 1]->strdisplaywidth()
+          \ : getcmdpos()
+    let col = cmdpos_bytes + [getcmdprompt()->len(), 1]->max()
     if !a:head_matched
       let col += 1
     endif
@@ -290,8 +295,6 @@ function s:get_cmdline_pos(head_matched, at_eol, word) abort
       let row -= 1
     endif
   endif
-
-  let col += a:word->strdisplaywidth()
 
   if !has('nvim')
     let col += 1
