@@ -290,6 +290,9 @@ function s:get_cmdline_pos(head_matched, at_eol, word) abort
     if !a:head_matched
       let col += 1
     endif
+    if !a:at_eol
+      let col -= 1
+    endif
 
     if !a:at_eol && has('nvim')
       let row -= 1
