@@ -11,6 +11,11 @@ function! ddc#ui#inline#_show(pos, items, params) abort
     return
   endif
 
+  if a:items->empty()
+    call ddc#ui#inline#_hide()
+    return
+  endif
+
   const complete_str = ddc#util#get_input('')[a:pos :]
   const next_input = ddc#util#get_next_input('')
   const next_word = next_input->matchstr('\w\+$')
@@ -25,14 +30,15 @@ function! ddc#ui#inline#_show(pos, items, params) abort
         \ : '.'->col() == '$'->col()
 
   " Head matched: Follow cursor text
-  let head_matched = a:items[0].word->stridx(complete_str) == 0
+  let head_matched = item_word->stridx(complete_str) == 0
   if a:params.checkNextWordMatched && head_matched && next_word !=# ''
     const next_word_pos = item_word->strridx(next_word)
     let head_matched =
           \ next_word_pos ==# item_word->len() - next_word->len()
   endif
 
-  if a:items->empty() || (head_matched && remaining ==# '')
+  if head_matched && remaining ==# ''
+    call ddc#ui#inline#_hide()
     return
   endif
 
